@@ -1,0 +1,6 @@
+---
+- hosts: OptiPlex-9020
+  tasks:
+  - name: test apt
+    apt:
+      name: curl
