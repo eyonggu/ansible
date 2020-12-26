@@ -1,6 +1,61 @@
 ---
 - hosts: OptiPlex-9020
+  become: true
+  vars:
+    home: /home/eyonggu
   tasks:
-  - name: test apt
+  - name: Install dev packages
     apt:
-      name: curl
+      name: "{{ packages }}"
+      state: present
+      update_cache: no
+    vars:
+      packages:
+      - git
+      - exuberant-ctags
+      - cscope
+
+  #Setup devenv
+  - name: Setup devenv
+    block:
+    - name: Clone devenv repo
+      git:
+        repo: 'https://github.com/eyonggu/devenv.git'
+        dest: "{{ home }}/.devenv"
+        force: yes
+    - name: setup .vimrc
+      file:
+        src: "{{ home }}/.devenv/vim/.vimrc"
+        dest: "{{ home }}/.vimrc"
+        state: link
+    - name: setup .vim
+      file:
+        src: "{{ home }}/.devenv/vim"
+        dest: "{{ home }}/.vim"
+        state: link
+    - name: clone fugitive plugin repo
+      git:
+        repo: 'https://github.com/tpope/vim-fugitive.git'
+        dest: "{{ home }}/.vim/bundle/vim-fugitive"
+    - name: clone supertab plugin repo
+      git:
+        repo: 'https://github.com/ervandew/supertab.git'
+        dest: "{{ home }}/.vim/bundle/supertab"
+    - name: clone ctrlp plugin repo
+      git:
+        repo: 'https://github.com/kien/ctrlp.vim.git'
+        dest: "{{ home }}/.vim/bundle/ctrlp.vim"
+    - name: clone vim-go plugin repo
+      git:
+        repo: 'https://github.com/fatih/vim-go.git'
+        dest: "{{ home }}/.vim/bundle/vim-go"
+    - name: clone ale plugin repo
+      git:
+        repo: 'https://github.com/dense-analysis/ale.git'
+        dest: "{{ home }}/.vim/bundle/ale"
+    - name: setup git config
+      file:
+        src: "{{ home }}/.devenv/git/.gitconfig"
+        dest: "{{ home }}/.gitconfig"
+        state: link
+
