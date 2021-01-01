@@ -1,8 +1,10 @@
 ---
 - hosts: Ubuntu
   become: true
+  become_user: eyonggu
   vars:
     home: /home/eyonggu
+
   tasks:
 
   #Setup devenv
