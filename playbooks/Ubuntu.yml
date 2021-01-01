@@ -1,0 +1,55 @@
+---
+- hosts: Ubuntu
+  become: true
+  vars:
+    home: /home/eyonggu
+  tasks:
+
+  #Setup devenv
+  - name: Setup devenv
+    block:
+    - name: Install dev packages
+      apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: no
+      with_items:
+        - git
+        - exuberant-ctags
+        - cscope
+    - name: Clone devenv repo
+      git:
+        repo: 'https://github.com/eyonggu/devenv.git'
+        dest: "{{ home }}/.devenv"
+        force: yes
+    - name: Create directories
+      command: "{{ item }}"
+      with_items:
+      - mkdir -p "{{ home }}/bin"
+      - mkdir -p "{{ home }}/.config/yamllint"
+    - name: Setup soft links
+      file:
+        src: "{{ home }}/.devenv/{{ item.src }}"
+        dest: "{{ home }}/{{ item.dst }}"
+        state: link
+      with_items:
+        - { src: 'vim/.vimrc', dst: '.vimrc' }
+        - { src: 'vim', dst: '.vim' }
+        - { src: 'git/.gitconfig', dst: '.gitconfig' }
+        - { src: 'bin/cs', dst: 'bin/cs' }
+        - { src: 'git/git_vimdiff_wrapper', dst: 'bin/git_vimdiff_wrapper' }
+        - { src: 'tag/ctags', dst: '.ctags' }
+        - { src: 'yamllint/config', dst: '.config/yamllint/config' }
+    - name: Clone vim plugin repos
+      git:
+        repo: 'https://github.com/{{ item }}.git'
+        dest: "{{ home }}/.vim/bundle/{{ item }}"
+      loop:
+        - tpope/vim-fugitive
+        - ervandew/supertab
+        - kien/ctrlp.vim
+        - fatih/vim-go
+        - dense-analysis/ale
+
+  #Install Docker
+

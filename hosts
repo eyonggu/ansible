@@ -1,1 +1,3 @@
+[Ubuntu]
 OptiPlex-9020 ansible_host=192.168.1.118 ansible_user=eyonggu ansible_password=eyonggu ansible_become_password=eyonggu
+
